@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         
         # 初始化当前页面
         self.current_page_index = 0
-    
+
     """设置应用程序样式"""
     def setup_styles(self):
         self.setStyleSheet("""
@@ -338,18 +338,48 @@ class MainWindow(QMainWindow):
         layout.addStretch()
         
         """设备管理页面"""
-    def create_device_page(self):
-        self.device_page = QWidget()
-        layout = QVBoxLayout(self.device_page)
-        
-        title = QLabel("设备管理")
-        title.setStyleSheet("font-size: 36px; font-weight: bold; color: #343a40;")
-        title.setAlignment(Qt.AlignCenter)
-        
-        layout.addWidget(title)
-        layout.addStretch()
 
-        """设置页面"""
+    def create_device_page(self):
+        """设备管理页面"""
+        from device_manager import DeviceManagerUI
+
+        # 使用独立的设备管理组件
+        self.device_page = DeviceManagerUI()
+
+        # 连接信号（示例，实际根据需求连接）
+        self.device_page.scan_requested.connect(self._scan_devices)
+        self.device_page.connect_requested.connect(self._connect_device)
+        self.device_page.disconnect_requested.connect(self._disconnect_device)
+
+        # 模拟一些测试设备
+        self._setup_test_devices()
+
+    def _setup_test_devices(self):
+        """设置测试设备（开发用）"""
+        from device_manager import EMGDevice, DeviceStatus
+
+        devices = [
+            EMGDevice("肌电采集器-A", "AA:BB:CC:DD:EE:FF", -45, 85, DeviceStatus.DISCONNECTED, "1.0.0"),
+            EMGDevice("肌电采集器-B", "11:22:33:44:55:66", -60, 100, DeviceStatus.DISCONNECTED, "1.0.0",
+                      is_paired=True),
+            EMGDevice("肌电采集器-C", "77:88:99:AA:BB:CC", -75, 30, DeviceStatus.CONNECTED, "1.0.0"),
+        ]
+
+        self.device_page.update_device_list(devices)
+
+    def _scan_devices(self):
+        """扫描设备（模拟）"""
+        QMessageBox.information(self, "扫描", "正在扫描附近设备...")
+        # 这里可以添加真实的蓝牙扫描逻辑
+
+    def _connect_device(self, device):
+        """连接设备（模拟）"""
+        QMessageBox.information(self, "连接", f"正在连接 {device.name}...")
+        self.device_page.update_connection_status(True, device.name)
+
+    def _disconnect_device(self):
+        """断开连接"""
+        self.device_page.update_connection_status(False)
     def create_settings_page(self):
         
         self.settings_page = QWidget()
@@ -524,7 +554,7 @@ def main():
         "祝您使用愉快喵！",
         QMessageBox.Ok
     )
-    
+
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
