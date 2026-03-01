@@ -1,3 +1,0 @@
-PyQt5==5.15.9
-pyqtgraph==0.14.0
-numpy==2.4.1
